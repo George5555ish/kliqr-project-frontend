@@ -13,42 +13,82 @@ const [users, setUsers] = useState([]);
 const [active, setActive] = useState(false);
 
 const [userForExpenses, setUserForExpenses] = useState();
-const [allowExpenses, setAllowExpenses] = useState(false)
+const [allowExpenses, setAllowExpenses] = useState(false);
+const [usersIdArray, setUsersIdArray] = useState([]);
+const [finalTransaction, setFinalTransaction] = useState([]);
   let newArr = [];
 
 
   // To handle background change;
-  const handleActive = (index) => {
+  const handleActive = (user,index) => {
     // console.log(index)
     setActive(true);
     setAllowExpenses(true)
-    sendUserData(index)
+    sendUserData(user)
+
+    handleTransactions(usersIdArray, user.id, finalTransaction)
   }
 
-  const sendUserData = (user) => {
-       
+  const sendUserData = (user) => {   
     setUserForExpenses(user);
-    // console.log(user)
   }
   
 const getUserId = (finalApi) => {
-
-  console.log(finalApi)
-
   if (finalApi.length !== 0){
-      
-  
     for (var i = 0; i < finalApi.length; i++){
       newArr.push(finalApi[i].id);
     }
-
-    console.log('this worked')
-    
-
-// console.log(newArr);
   }
 
+  setUsersIdArray(newArr);
   
+}
+
+const getSingleUserTransaction = async (userId) => {
+
+  const singleTransaction = await axios.get("http://localhost:3000/transactions/" + userId);
+
+  console.log(singleTransaction.data.result);
+  return singleTransaction.data.result;
+}
+
+const handleTransactions = async (userIdArray,userId, finalTrans) => {
+
+
+  // Steps to Execute User Expense Trends.
+
+  //1. Get the specific user to be checked. (Done)
+  //2. Use logic to get a list of all categories spent by user (Done)
+  //3. Sort Data on a monthly basis and increment a counter
+      //based on the number of times a category appears.
+  //4. 
+  console.log(finalTrans);
+  console.log(userId)
+
+  const userTransactionArray = await getSingleUserTransaction(userId);
+  getUserCategories(userTransactionArray)
+}
+
+const getUserCategories = (userArray) => {
+
+  let finalCategories;
+
+  let stringCategories = '';
+  // console.log(userArray)
+  userArray.map((userItem) => {
+
+ 
+
+      if(stringCategories.includes(userItem.category) == false){
+       
+        stringCategories = stringCategories +"/"+ userItem.category;
+      }
+   
+  });
+
+  finalCategories = stringCategories.split('/').slice(1, stringCategories.length);
+  console.log(finalCategories)
+
 }
 
   useEffect( async () => {
@@ -57,11 +97,17 @@ const getUserId = (finalApi) => {
     const apiTransactions = await axios.get("http://localhost:3000/transactions");
     const apiUsers = await axios.get("http://localhost:3000/user");
    
+
+    // To get the list of user's in the database
     const finalApi = [...apiUsers.data.data];
+
+    //To get all user transactions
+    const finalTrans = [apiTransactions.data.data];
     // console.log(apiUsers.data.data)
     setUsers(finalApi);
     getUserId(finalApi);
-    // console.log(users)
+    setFinalTransaction(finalTrans);
+   
   }, [])
   return (
     <div className="App">
@@ -74,11 +120,12 @@ const getUserId = (finalApi) => {
         <div className="users-container">
           <p className="users-heading">USERS</p>
 
-          {   users.map((user, index) => (
-          <div className={active ? "single-user active" : "single-user"} onClick={() => handleActive(user)}>
+          {   
+            users.map((user, index) => (
+         index <= 10 ?  <div className={active ? "single-user active" : "single-user"} onClick={() => handleActive(user, index)}>
           <SingleUser user={user} active={active} showArrow={true} />
-          </div>
-        ))}
+          </div> : null))
+       }
         </div>
       ) :<div className="margin-top"> <CircularProgress /></div>
     }
@@ -86,7 +133,7 @@ const getUserId = (finalApi) => {
 
     <div className="right-side">
       {
-        !allowExpenses ? <div><h2>Please select a user</h2></div> :<Expenses userForExpenses={userForExpenses}/>
+        !allowExpenses ? <div><h2>Please select a user</h2></div> :<Expenses userForExpenses={userForExpenses} usersIdArray={usersIdArray}/>
       }
     </div>
     </div>

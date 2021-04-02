@@ -2,9 +2,10 @@ import React from 'react';
 import SimilarUsers from '../SimilarUsers/SimilarUsers';
 import SingleUser from '../SingleUser/SingleUser';
 
-const Expenses = ({userForExpenses}) => {
+const Expenses = ({userForExpenses, usersIdArray}) => {
 
-    // console.log(userForExpenses)
+    // console.log(usersIdArray)
+    // console.log(userForExpenses.id)
     return (
         <div className="expenses-container">
             <div>
