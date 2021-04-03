@@ -48,7 +48,7 @@ const getSingleUserTransaction = async (userId) => {
 
   const singleTransaction = await axios.get("http://localhost:3000/transactions/" + userId);
 
-  console.log(singleTransaction.data.result);
+  // console.log(singleTransaction.data.result);
   return singleTransaction.data.result;
 }
 
@@ -60,13 +60,109 @@ const handleTransactions = async (userIdArray,userId, finalTrans) => {
   //1. Get the specific user to be checked. (Done)
   //2. Use logic to get a list of all categories spent by user (Done)
   //3. Sort Data on a monthly basis and increment a counter
-      //based on the number of times a category appears.
+       //based on the number of times a category appears.
   //4. 
-  console.log(finalTrans);
-  console.log(userId)
+  // console.log(finalTrans);
+  // console.log(userId);
 
   const userTransactionArray = await getSingleUserTransaction(userId);
-  getUserCategories(userTransactionArray)
+  const userCategories = await getUserCategories(userTransactionArray) // Function to handle category generation
+  await generateExpensesPerMonth(userCategories, userTransactionArray);
+}
+
+const generateExpensesPerMonth = (userCategories, userTransactionArray) => {
+console.log('worked')
+console.log(userCategories)
+
+console.log(userTransactionArray)
+
+let arrayDates = [];
+let newUserCategories = [];
+let allTransactionsInYear = [];
+
+const date = new Date();
+const currentYear = date.getFullYear();
+const currentMonth = date.getMonth();
+const prevYear = currentYear - 1;
+
+// console.log(currentMonth, currentYear);
+
+    let testMonth = 3;
+    let testYear = 2021;
+
+    while (testMonth <= currentMonth && testYear == currentYear){
+
+    
+      if (testMonth == 0){
+        testMonth = 12;
+        testYear--;
+      }
+
+      // console.log(testMonth + "/" + testYear);
+      arrayDates.push(testMonth + "/" + testYear)
+     
+      if (testMonth > 0){
+        testMonth--;
+      }
+
+    }
+
+
+    while (testMonth >= currentMonth){
+
+    
+     
+
+     
+      arrayDates.push(testMonth + "/" + prevYear)
+      testMonth--;
+
+    }
+
+    console.log(arrayDates)
+ 
+    if (arrayDates){
+      for (var i = 0; i < arrayDates.length; i++){
+
+        let categoryCount = 0;
+        let month = arrayDates[i].split("/")[0];
+        let year = arrayDates[i].split("/")[1];
+
+        let fixedMonth = month.length == 1 ? "0" + month : month
+    
+        console.log(fixedMonth, year)
+        //This is the month out of the date for each of the dates in the 
+        //array. We use this as a parameter to filter the entire array. 
+    
+        let sortedArray = userTransactionArray.map((singleTrans) => singleTrans);
+        let arraySortedByYear = sortedArray.filter((x) => x.date_time.split("-")[0] == year);
+        let finalArray = arraySortedByYear.filter((x) => x.date_time.split("-")[1] == fixedMonth);
+
+        console.log(finalArray);
+
+        allTransactionsInYear.push([finalArray]);
+        
+
+         newUserCategories = userCategories.reduce(function(s, a){
+          s.push({category: a, categoryLength: 0});
+          return s;
+        }, []);
+      }
+
+      console.log(newUserCategories);
+      console.log(allTransactionsInYear);
+
+     
+
+
+
+
+    }
+
+
+
+
+ 
 }
 
 const getUserCategories = (userArray) => {
@@ -84,11 +180,11 @@ const getUserCategories = (userArray) => {
         stringCategories = stringCategories +"/"+ userItem.category;
       }
    
+
   });
 
   finalCategories = stringCategories.split('/').slice(1, stringCategories.length);
-  console.log(finalCategories)
-
+      return finalCategories;
 }
 
   useEffect( async () => {
@@ -122,7 +218,7 @@ const getUserCategories = (userArray) => {
 
           {   
             users.map((user, index) => (
-         index <= 10 ?  <div className={active ? "single-user active" : "single-user"} onClick={() => handleActive(user, index)}>
+         index <= 10 ?  <div key={index} className={active ? "single-user active" : "single-user"} onClick={() => handleActive(user, index)}>
           <SingleUser user={user} active={active} showArrow={true} />
           </div> : null))
        }
