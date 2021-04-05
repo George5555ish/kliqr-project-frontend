@@ -169,6 +169,14 @@ background-color: #fff;
   
 }
 
+.tool-tip{
+  position: relative;
+}
+
+.tool-tip-child{
+ position: absolute;
+  /*  display: none; */
+}
 .fancy-div{
   background-color: rgb(255, 255, 255);
   border: 2.5px solid rgb(243, 243, 243);
@@ -177,7 +185,7 @@ background-color: #fff;
   padding: 12px 25px;
   padding-left: 10px;
   padding-bottom: 2px;
-  width: 130px;
+  width: 150px;
 }
 
 .fancy-title{
@@ -193,7 +201,8 @@ background-color: #fff;
   text-align: left;
   font-weight: 800;
   line-height: 0;
-  font-size: 40px;
+  /* font-size: 25px; */
+  width: inherit;
   color:rgb(112, 79, 204)
 }
 
@@ -231,10 +240,24 @@ background-color: #fff;
   width: 80px;
   margin: 5px 25px;
   border-radius: 20px;
+  cursor: pointer;
+  transition: 0.25s;
+  padding: 5px;
   /* margin-bottom: 5px */
 } 
+
+.img-recurring:hover{
+  background: rgb(112, 79, 204);
+}
 
 .control-similar{
   height: 100px;
   width: 520px;
 }
+
+.fix-height{
+  height: 100px;
+  cursor: pointer;
+  transition: 1.5s;
+}
+

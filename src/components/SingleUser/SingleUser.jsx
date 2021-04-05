@@ -1,7 +1,41 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 
-const SingleUser = ({user, showArrow}) => {
+
+
+const SingleUser = ({user, showArrow, finalSingleTransaction, indexCount}) => {
+
+    const [dateJoined, setDateJoined] = useState('')
+    useEffect(() => {
+        const getDateJoined = () => {
+            const date = new Date();
+            let newDate;
+            const currentMonth = date.getMonth();
+            const currentYear = date.getFullYear();
+      
+            const userMonthJoined = user.created_at.split('-')[1];
+            const userYearJoined = user.created_at.split('-')[0];
+      
+            const yearsJoined = currentYear - userYearJoined;
+            const monthsJoined = Math.abs(currentMonth - userMonthJoined);
+      
+              if (yearsJoined == 0){
+                 newDate = `Joined ${monthsJoined} months ago`;
+              } else if (yearsJoined == 1){
+                  newDate = `Joined 1 year and ${monthsJoined} months ago`;
+              } else {
+                    newDate = `Joined ${yearsJoined} years and ${monthsJoined} months ago`;
+              }
+
+              setDateJoined(newDate)
+
+            //  console.log(typeof)
+          // console.log(date);
+          // console.log(user.created_at)   
+          }
+
+          getDateJoined();
+    })
     return (
         <div className="singleuser-wrapper">
 
@@ -14,15 +48,12 @@ const SingleUser = ({user, showArrow}) => {
        <div className="right-data">
        <p className="user-name">{user.first_name} {user.last_name}</p>
             <div className="trans-div">
-                <p className="trans-text">300 Transactions <span>.</span>Joined 2 months ago</p>
+                <p className="trans-text">{finalSingleTransaction[indexCount]} Transactions <div></div><span>.</span> {dateJoined}</p>
             </div>
        </div>
        </div>
 
-   {
-    showArrow &&   <span style={{marginRight: '10px'}}><ArrowForwardIosIcon /></span>
-   }
-      </div>
+{showArrow && <span style={{marginRight: '10px'}}><ArrowForwardIosIcon /></span>}      </div>
         </div>
     )
 }
