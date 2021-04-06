@@ -180,9 +180,16 @@ sendUserData(userForExpenses)
   // };
 
   const getSingleUserTransaction = async (userId) => {
-    const singleTransaction = await axios.get(bridgeLink + userId);
+    let singleTransaction;
+     await axios.get('https://kliqr-project-service-link.herokuapp.com/' + userId).then(response => {
+      //  console.log(response);
+       singleTransaction = response;
+     
+      }).catch(error => console.log(error));
 
-   // console(singleTransaction.data.payload.data);
+  //     console.log(singleTransaction.data);
+  //     console.log(singleTransaction.data.payload);
+  //  console.log(singleTransaction.data.payload.data);
     await setUserSingleTransaction(singleTransaction.data.payload.data);
     return singleTransaction.data.payload.data;
   };
@@ -363,13 +370,22 @@ sendUserData(userForExpenses)
     }
    const handleRendering = async () => {
 
+      let finalApi;
        // console('here')
-        const apiUsers = await axios.get("https://kliqr-project-expense-trend.herokuapp.com/user");
+       await axios.get("https://kliqr-project-expense-trend.herokuapp.com/user").then(response => {
+         
+          // console.log('response');
+          // console.log(response.data.data)
+          finalApi = response.data.data;
+        }).catch(error => console.log(error));
 
-       // console(apiUsers)
+      //  console.log('apiUsers')
+      //  console.log(apiUsers)
         // To get the list of user's in the database
-        const finalApi = [...apiUsers.data.data];
-       // console(finalApi)
+        // const finalApi = [...apiUsers.data];
+      //  console.log('finalApi')
+      //  console.log(finalApi)
+      //  finalApi = [...apiUsers.data.data];
       
         //To update the state of users that'll be rendered in the
         //Expenses component
@@ -454,7 +470,9 @@ sendUserData(userForExpenses)
         <div className="right-side">
        
             <div>
-             {!showUsers && <h2>Please select a user</h2>}
+
+            {!showUsers ? '': (!active && <h2>Please select a user</h2>)}
+          
             </div>
          
 
