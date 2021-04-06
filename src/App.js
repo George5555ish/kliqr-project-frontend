@@ -27,8 +27,10 @@ function App() {
   const [circularPercentage, setCircularPercentage] = useState(0);
 
   const [similarTrendsData, setSimilarTrendsData] = useState([]);
-  const [refreshUseEffect, setRefreshUseEffect] = useState(false)
+  const [refreshUseEffect, setRefreshUseEffect] = useState(false);
 
+  const expenseTrendLink = 'https://kliqr-project-expense-trend.herokuapp.com/';
+  const bridgeLink = 'https://kliqr-project-service-link.herokuapp.com';
   // const [expenseUserIdArray]
 
   let newArr = [];
@@ -178,7 +180,7 @@ sendUserData(userForExpenses)
   // };
 
   const getSingleUserTransaction = async (userId) => {
-    const singleTransaction = await axios.get("http://localhost:3030/" + userId);
+    const singleTransaction = await axios.get(bridgeLink + userId);
 
    // console(singleTransaction.data.payload.data);
     await setUserSingleTransaction(singleTransaction.data.payload.data);
@@ -362,7 +364,7 @@ sendUserData(userForExpenses)
    const handleRendering = async () => {
 
        // console('here')
-        const apiUsers = await axios.get("http://localhost:3000/user");
+        const apiUsers = await axios.get(expenseTrendLink + "/user");
 
        // console(apiUsers)
         // To get the list of user's in the database

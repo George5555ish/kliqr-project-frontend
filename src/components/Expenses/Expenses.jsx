@@ -24,14 +24,16 @@ const Expenses = ({
   const [arrangeNewTransaction, setArrangeNewTransactions] = useState([])
 
  
-  const [showExpenseCircular, setShowExpenseCircular] = useState(false)
+  const [showExpenseCircular, setShowExpenseCircular] = useState(false);
+  const expenseTrendLink = 'https://kliqr-project-expense-trend.herokuapp.com/';
+
   const getUsersById = async (usersArray) => {
     let users = [];
     let transactions = [];
     for (var testing = 0; testing < 2; testing++) {
     //   // console.log("started");
       const transaction = await getSingleUserTransaction(usersArray[testing]);
-      const apiUsers = await axios.get("http://localhost:3000/user");
+      const apiUsers = await axios.get(expenseTrendLink + "/user");
     //   // console.log("users");
     //   // console.log(apiUsers.data.data);
 
