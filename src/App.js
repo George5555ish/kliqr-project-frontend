@@ -29,7 +29,7 @@ function App() {
   const [similarTrendsData, setSimilarTrendsData] = useState([]);
   const [refreshUseEffect, setRefreshUseEffect] = useState(false);
 
-  const expenseTrendLink = 'https://kliqr-project-expense-trend.herokuapp.com/';
+  const expenseTrendLink = 'https://kliqr-project-expense-trend.herokuapp.com';
   const bridgeLink = 'https://kliqr-project-service-link.herokuapp.com';
   // const [expenseUserIdArray]
 
@@ -364,7 +364,7 @@ sendUserData(userForExpenses)
    const handleRendering = async () => {
 
        // console('here')
-        const apiUsers = await axios.get(expenseTrendLink + "/user");
+        const apiUsers = await axios.get("https://kliqr-project-expense-trend.herokuapp.com/user");
 
        // console(apiUsers)
         // To get the list of user's in the database
