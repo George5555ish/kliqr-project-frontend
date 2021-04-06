@@ -21,7 +21,7 @@ const SingleUser = ({user, showArrow, finalSingleTransaction, indexCount}) => {
       
               if (yearsJoined == 0){
                  newDate = `Joined ${monthsJoined} months ago`;
-              } else if (yearsJoined == 1){
+              } else if (yearsJoined === 1){
                   newDate = `Joined 1 year and ${monthsJoined} months ago`;
               } else {
                     newDate = `Joined ${yearsJoined} years and ${monthsJoined} months ago`;
@@ -42,13 +42,13 @@ const SingleUser = ({user, showArrow, finalSingleTransaction, indexCount}) => {
       <div className="flex-side align-side space-side">
       <div className="flex-side align-side">
        <div className="left-img">
-            <img src={user.avatar} className="user-image"/>
+            <img src={user.avatar} className="user-image" alt="user-image"/>
         </div>
        
        <div className="right-data">
-       <p className="user-name">{user.first_name} {user.last_name}</p>
+       <span className="user-name">{user.first_name} {user.last_name}</span>
             <div className="trans-div">
-                <p className="trans-text">{finalSingleTransaction[indexCount]} Transactions <div></div><span>.</span> {dateJoined}</p>
+                <span className="trans-text">{finalSingleTransaction[indexCount]} Transactions <div></div><span>.</span> {dateJoined}</span>
             </div>
        </div>
        </div>

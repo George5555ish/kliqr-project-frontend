@@ -11,33 +11,36 @@ function App() {
   const [active, setActive] = useState(false);
   const [similarTrendsRun, setSimilarTrendsRun] = useState(true);
 
+  const [finalSimilarTrends, setFinalSimilarTrends] = useState([]);
+
 
   const [showUsers, setShowUsers] = useState(false)
   const [userForExpenses, setUserForExpenses] = useState([]);
   const [userSingleTransaction, setUserSingleTransaction] = useState([]);
-  const [allowExpenses, setAllowExpenses] = useState(false);
+  // const [allowExpenses, setAllowExpenses] = useState(false);
   const [usersIdArray, setUsersIdArray] = useState([]);
   const [finalSingleTransaction, setFinalSingleTransaction] = useState([]);
-  const [indexCount, setIndexCount] = useState(0)
+  const [indexCountValue, setIndexCountValue] = useState(0)
   const [expenseTrend, setExpenseTrend] = useState([]);
   const [userId, setUserId] = useState(641);
   const [showCircular, setShowCircular] = useState(true);
   const [circularPercentage, setCircularPercentage] = useState(0);
 
   const [similarTrendsData, setSimilarTrendsData] = useState([]);
-
+  const [refreshUseEffect, setRefreshUseEffect] = useState(false)
 
   // const [expenseUserIdArray]
 
   let newArr = [];
 
   // To handle background change;
-  const handleActive = async (user,finalTransaction, indexCount) => {
-    // console.log(index)
-    setActive(true);
-    setIndexCount(indexCount)
+  const handleActive = async (user,finalTransaction, indexCount, setRefreshValue) => {
+    //// console(index)
+    setActive(true); 
+    // setAllowExpenses(true);
+    setIndexCountValue(indexCount)
     
-    sendUserData(user,finalTransaction, indexCount);
+    sendUserData(user,finalTransaction, indexCount, setRefreshValue);
     setUserId(user.id);
     handleTransactions( user.id);
 
@@ -45,97 +48,122 @@ function App() {
     if (similarTrendsRun){
       setSimilarTrendsRun(false);
     // const firstId = await handleAllTransactions(usersIdArray);
-    // console.log(firstId);
+    //// console(firstId);
     setShowCircular(false);
     }
-    setAllowExpenses(true);
+   
   };
 
   //Function to be used in the Expenses array to 
   //find similar Trends
   const handleSimilarTrends = async(expenseTrend) => {
 
-    console.log(usersIdArray)
-    console.log(expenseTrend)
+   // console(usersIdArray)
+   // console(expenseTrend)
     setSimilarTrendsRun(true);
 
     // This generates the expense trend for other users.
    const finalArray =  await handleAllTransactions(usersIdArray);
-   console.log('this is it')
-   console.log(finalArray)
+  // console('this is it')
+  // console(finalArray)
    setSimilarTrendsData(finalArray);
-
-   console.log('About to send request to similar trend server')
    getSimilarTrends(expenseTrend, finalArray);
 
-   
+   setFinalSimilarTrends(finalSimilarTrends * 1)
 
   }
 
   const getSimilarTrends = (expenseTrend, finalArray) => {
 
     const similarUserTrends = [];
-    let numberOfTrends = 8;
-    console.log('expenseTrend');
-    console.log(expenseTrend);
+    let numberOfTrends = 8; 
+   
+    let numberofSimilarTrendsBetweenUsers = 5;
+    //// console('expenseTrend');
+    //// console(expenseTrend);
 
     let shortenedTrends = expenseTrend.slice(0, numberOfTrends);
 
-    console.log('finalArray')
+    //// console('finalArray')
 
-    console.log(finalArray);
+    //// console(finalArray);
+    //// console(finalArray[0])
+    //// console(finalArray[0].transaction)
+//  First loops will iterate through all the users
 
+for (var users = 0; users < finalArray.length; users++){
+  
+ let firstUser = finalArray[users].transaction;
+// // console('firstUser')
+// // console(firstUser[users])
+ let similarityCount = 0;
+    // Looping through each trend for current user
+    for (let userTrend = 0; userTrend < shortenedTrends.length; userTrend++){
 
-    // Looping through all trends of a particular user
-    for (var i = 0; i < shortenedTrends.length; i++){
-        let currentUserCategory = shortenedTrends[i];
+      let currentUserTrend = shortenedTrends[userTrend];
+     
+      //// console(currentUserTrend);
 
-        // Looping through all Users
-        for (var j = 0; j < finalArray.length; j++){
+    
+     
 
-          let currentTestUser = finalArray[j].transaction;
-
-          // Looping through each user's categories
-          const similarUser = currentTestUser.filter((x) => x.category == currentUserCategory)
-
-          if (similarUser.length > 0){
-
-           similarUserTrends.push(finalArray[j].userId)
-
-          }
+      // Looping through all trends in each user transaction
+      //to validate if current trends match with original trend
+      for (var jent = 0; jent < firstUser.length; jent++){
+        
+        //// console(firstUser[jent].category)
+        //// console(currentUserTrend.category)
+        if (firstUser[jent].category === currentUserTrend.category){
+          similarityCount++;
+          //// console('it added');
+          //// console(similarityCount)
         }
+      }
 
 
+      
     }
 
-    console.log('Users with similar Trends')
-    console.log(similarUserTrends)
+
+    //// console('similarity count after')
+    //// console(similarityCount)
+
+    if (similarityCount > numberofSimilarTrendsBetweenUsers){
+      similarUserTrends.push(finalArray[users].userId);
+    }
+}
+
+//// console(similarUserTrends)
+setFinalSimilarTrends(similarUserTrends);
+sendUserData(userForExpenses)
   }
 
   const handleAllTransactions = async(userIdArray) => {
     let allTransactions = [];
     var number = 0;
-    console.log(userIdArray)
+   // console(userIdArray)
     for (var count = 0; count < userIdArray.length; count++){
     
       setCircularPercentage(parseFloat(number /userIdArray.length) * 100)
       number++;
       const singleTrans = await handleTransactions(userIdArray[count]);
-      console.log(singleTrans)
+     // console(singleTrans)
       allTransactions.push({ "transaction":singleTrans, "userId": userIdArray[count]});
-      // console.log(allTransactions)
+      //// console(allTransactions)
     }
 
-    console.log('this one from function')
-    console.log(allTransactions)
+   // console('this one from function')
+   // console(allTransactions)
 
     return allTransactions;
   }
-  const sendUserData = (user, finalTransaction, indexCount) => {
+  const sendUserData = (user, finalTransaction, indexCount, setRefreshValue) => {
 
     //This function is an intermediate between Expenses component.
     //It sends data from the app to Expenses.
     setUserForExpenses(user);
+    setRefreshUseEffect(false)
+
 
   };
 
@@ -152,9 +180,9 @@ function App() {
   const getSingleUserTransaction = async (userId) => {
     const singleTransaction = await axios.get("http://localhost:3030/" + userId);
 
-    // console.log(singleTransaction.data.result);
-    await setUserSingleTransaction(singleTransaction.data.result);
-    return singleTransaction.data.result;
+   // console(singleTransaction.data.payload.data);
+    await setUserSingleTransaction(singleTransaction.data.payload.data);
+    return singleTransaction.data.payload.data;
   };
 
   const handleTransactions = async ( userId) => {
@@ -181,10 +209,10 @@ function App() {
   };
 
   const generateExpensesPerMonth = (userCategories, userTransactionArray) => {
-    // console.log('worked')
-    // console.log(userCategories)
+    //// console('worked')
+    //// console(userCategories)
 
-    // console.log(userTransactionArray)
+    //// console(userTransactionArray)
 
     let arrayDates = [];
     let newUserCategories = [];
@@ -195,7 +223,7 @@ function App() {
     const currentMonth = date.getMonth();
     const prevYear = currentYear - 1;
 
-    // console.log(currentMonth, currentYear);
+    //// console(currentMonth, currentYear);
 
     let testMonth = 3;
     let testYear = 2021;
@@ -206,7 +234,7 @@ function App() {
         testYear--;
       }
 
-      // console.log(testMonth + "/" + testYear);
+      //// console(testMonth + "/" + testYear);
       arrayDates.push(testMonth + "/" + testYear);
 
       if (testMonth > 0) {
@@ -220,7 +248,7 @@ function App() {
     }
 
     arrayDates = arrayDates.splice(1, arrayDates.length);
-    // console.log(arrayDates)
+    //// console(arrayDates)
 
 
     if (arrayDates) {
@@ -230,7 +258,7 @@ function App() {
 
         let fixedMonth = month.length === 1 ? "0" + month : month;
 
-        // console.log(fixedMonth, year)
+        //// console(fixedMonth, year)
         //This is the month out of the date for each of the dates in the
         //array. We use this as a parameter to filter the entire array.
 
@@ -244,7 +272,7 @@ function App() {
           (x) => x.date_time.split("-")[1] === fixedMonth
         );
 
-        // console.log(finalArray);
+        //// console(finalArray);
 
         allTransactionsInYear.push([finalArray]);
 
@@ -256,12 +284,12 @@ function App() {
 
       setUserSingleTransaction(allTransactionsInYear);
 
-      // console.log(newUserCategories);
-      // console.log(allTransactionsInYear);
+      //// console(newUserCategories);
+      //// console(allTransactionsInYear);
 
-      for (var i = 0; i < allTransactionsInYear.length; i++) {
-        var transact = allTransactionsInYear[i][0];
-        // console.log(transact);
+      for (let select = 0; select < allTransactionsInYear.length; select++) {
+        var transact = allTransactionsInYear[select][0];
+        //// console(transact);
 
         for (var j = 0; j < transact.length; j++) {
           var answer = transact[j];
@@ -288,8 +316,8 @@ function App() {
     let finalCategories;
 
     let stringCategories = "";
-    // console.log(userArray)
-    userArray.map((userItem) => {
+    //// console(userArray)
+    userArray.forEach((userItem) => {
       if (stringCategories.includes(userItem.category) === false) {
         stringCategories = stringCategories + "/" + userItem.category;
       }
@@ -303,7 +331,7 @@ function App() {
 
   useEffect(() => {
     const getAllUserId = (finalApi) => {
-      console.log('start')
+     // console('start')
       if (finalApi.length !== 0) {
         for (var i = 0; i < finalApi.length; i++) {
           newArr.push(finalApi[i].id);
@@ -312,7 +340,7 @@ function App() {
       
 
       setUsersIdArray(newArr);
-      console.log('done')
+     // console('done')
     };
 
     const handleAllSingleTransactions = async(usersIdArray) => {
@@ -333,13 +361,13 @@ function App() {
     }
    const handleRendering = async () => {
 
-        console.log('here')
+       // console('here')
         const apiUsers = await axios.get("http://localhost:3000/user");
 
-        console.log(apiUsers)
+       // console(apiUsers)
         // To get the list of user's in the database
         const finalApi = [...apiUsers.data.data];
-        console.log(finalApi)
+       // console(finalApi)
       
         //To update the state of users that'll be rendered in the
         //Expenses component
@@ -355,19 +383,19 @@ function App() {
           
         }
         
-        // console.log(usersIdArray)
-        // console.log('here');
+        //// console(usersIdArray)
+        //// console('here');
 
         // This gets the transasction length of all users
         //to render the number of transactions on componentDidMount
        
-        if (usersIdArray.length !== 0){
+        if (usersIdArray.length !== 0 || refreshUseEffect){
           const allSingleTransactions = await handleAllSingleTransactions(usersIdArray);
         
-          // console.log('FINAL')
-          // console.log(allSingleTransactions);
+          //// console('FINAL')
+          //// console(allSingleTransactions);
           setFinalSingleTransaction(allSingleTransactions);
-       
+          setRefreshUseEffect(false)
         
               
         }
@@ -412,34 +440,38 @@ function App() {
               )}
             </div>
           ) : (
-            <div className="margin-top">
+            <div className="margin-top" style={{width: '200px'}}>
               {" "}
               <CircularProgress />
-              <h2>Please wait ...</h2>
-              <div>{circularPercentage}%</div>
+              <h2 className="fancy-text">Please wait ...</h2>
+              <div className="fancy-text" style={{marginTop: '30px'}}>{circularPercentage}%</div>
             </div>
           )}
         </div>
 
         <div className="right-side">
-          {!allowExpenses ? (
+       
             <div>
-              <h2>Please select a user</h2>
+             {!showUsers && <h2>Please select a user</h2>}
             </div>
-          ) : (
+         
 
-            showCircular ? <div><CircularProgress /></div> : <Expenses
+            {showCircular ? <div></div> : <Expenses
               userForExpenses={userForExpenses}
               expenseTrend={expenseTrend}
               userSingleTransaction={userSingleTransaction}
               finalSingleTransaction={finalSingleTransaction}
-              indexCount={indexCount}
+              indexCountValue={indexCountValue}
               userId={userId}
               similarTrendsRun={similarTrendsRun}
               similarTrendsData={similarTrendsData}
               handleSimilarTrends={handleSimilarTrends}
-            />
-          )}
+              finalSimilarTrends={finalSimilarTrends}
+              handleActive={handleActive}
+              refreshUseEffect={refreshUseEffect}
+              getSingleUserTransaction={getSingleUserTransaction}
+            />}
+          
         </div>
       </div>
     </div>
